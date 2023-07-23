@@ -12,7 +12,7 @@ jobs:
     steps:
       - name: Set release version
         id: release-version
-        run: echo "release-version=$(curl -L -s https://dl.k8s.io/release/stable.txt)" >> $GITHUB_OUTPUT
+        run: echo "release-version=$(curl -L -s https://dl.k8s.io/release/stable.txt | sed 's/v//')" >> $GITHUB_OUTPUT
 
   multiarch-build:
     uses: npastorale/workflows/.github/workflows/multiarch-build.yaml@master
