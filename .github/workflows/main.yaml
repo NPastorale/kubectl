@@ -4,11 +4,17 @@ on:
   push:
     tags:
       - "v*.*.*"
+  workflow_dispatch:
 
 jobs:
+  get-release-version:
+    uses: npastorale/workflows/.github/workflows/release-version.yaml@master
+
   multiarch-build:
     uses: npastorale/workflows/.github/workflows/multiarch-build.yaml@master
+    needs: get-release-version
     with:
       username: npastorale
+      release-version: ${{ needs.get-release-version.outputs.release-version }}
     secrets:
       access-token: ${{ secrets.docker_token }}
