@@ -2,18 +2,23 @@ name: Multiarch-build
 
 on:
   push:
-    tags:
-      - "v*.*.*"
+    branches: master
 
 jobs:
-  get-release-version:
-    uses: npastorale/workflows/.github/workflows/release-version.yaml@master
+  get-version-from-release:
+    runs-on: ubuntu-latest
+    outputs:
+      release-version: ${{ steps.release-version.outputs.release-version }}
+    steps:
+      - name: Set release version
+        id: release-version
+        run: echo "release-version=$(curl -L -s https://dl.k8s.io/release/stable.txt)" >> $GITHUB_OUTPUT
 
   multiarch-build:
     uses: npastorale/workflows/.github/workflows/multiarch-build.yaml@master
-    needs: get-release-version
+    needs: get-version-from-release
     with:
       username: npastorale
-      release-version: ${{ needs.get-release-version.outputs.release-version }}
+      release-version: ${{ needs.get-version-from-release.outputs.release-version }}
     secrets:
       access-token: ${{ secrets.docker_token }}
